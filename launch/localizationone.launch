@@ -1,0 +1,93 @@
+<launch>
+    <!--Localization Module Fusing IMU with GPS Data. Not recommended but required due to lack of odom data-->
+
+    <node name="imugpspublisherSVY21" pkg="epochmini" type="imugpspublisherSVY21.py" />
+
+    <node pkg="robot_localization" type="ukf_localization_node" name="ukf_localization" clear_params="true">
+      <remap from="odometry/filtered" to="odom/filtered"/>
+
+      <param name="frequency" value="30"/>
+      <param name="sensor_timeout" value="0.1"/>
+      <param name="two_d_mode" value="true"/>
+
+      <param name="map_frame" value="map"/>
+      <param name="odom_frame" value="odom"/>
+      <param name="base_link_frame" value="base_link"/>
+      <param name="world_frame" value="odom"/>
+
+      <param name="transform_time_offset" value="0.0"/>
+
+      <param name="imu0" value="imuBoat"/>
+      <param name="twist0" value="twistGPS"/>
+
+      <rosparam param="imu0_config">[false, false, false,
+                                     false,  false,  true,
+                                     false, false, false,
+                                     false,  false,  true,
+                                     true,  true,  false]</rosparam>
+
+      <rosparam param="twist0_config">[false, false,  false,
+                                      false, false, false,
+                                      true, true, false,
+                                      false, false, true,
+                                      false, false, false]</rosparam>
+
+      <param name="imu0_differential" value="false"/>
+      
+      <param name="imu0_relative" value="true"/>
+
+      <param name="imu0_remove_gravitational_acceleration" value="true"/>
+
+      <param name="print_diagnostics" value="true"/>
+
+      <!-- ======== ADVANCED PARAMETERS ======== -->
+
+      <!-- Most users will be able to remove these parameters from the launch file without any consequences. We recommend
+           that users do not set values for these parameters without having a thorough understanding of
+           the parameters do. -->
+
+      <!-- By default, the subscription queue size for each message type is 1. If you wish to increase that so as not
+           miss any messages (even if your frequency is set to a relatively small value), increase these. -->
+      <param name="imu0_queue_size" value="20"/>
+      <param name="twist0_queue_size" value="5"/>
+
+      <!-- If your data is subject to outliers, use these threshold settings, expressed as Mahalanobis distances, to control
+           how far away from the current vehicle state a sensor measurement is permitted to be. Each defaults to
+           numeric_limits<double>::max() if unspecified. -->
+      <param name="imu0_pose_rejection_threshold" value="0.3"/>
+      <param name="imu0_twist_rejection_threshold" value="0.1"/>
+      <param name="imu0_linear_acceleration_rejection_threshold" value="0.1"/>
+      <param name="twist0_rejection_threshold" value="1.2"/>
+
+      <!-- Debug settings. Not for the faint of heart. Outputs a ludicrous amount of information to the file
+           specified by debug_out_file. I hope you like matrices! Defaults to false if unspecified. -->
+      <param name="debug"           value="false"/>
+      <!-- Defaults to "robot_localization_debug.txt" if unspecified. -->
+      <param name="debug_out_file"  value="debug_ukf_localization.txt"/>
+
+      <!-- ======== UKF-SPECIFIC PARAMETERS ======== -->
+
+      <!-- The alpha and kappa variables control the spread of the sigma points. Unless you are familiar with
+           UKFs, it's probably a good idea to leave these alone. -->
+      <!-- Defaults to 0.001 if unspecified. -->
+      <param name="alpha" value="0.001"/>
+      <!-- Defaults to 0 if unspecified. -->
+      <param name="kappa" value="0"/>
+
+      <!-- The beta variable relates to the distribution of the state vector. Again, it's probably best to leave
+           this alone if you're uncertain. -->
+      <!-- Defaults to 2 if unspecified. -->
+      <param name="beta" value="2"/>
+
+      <!--  By default, the node outputs an Odometry message with the topic name odometry/filtered. Uncomment and modify this
+            line if you want the node to output to another topic-->
+      <!-- <remap from="odometry/filtered" to="your_desired_topic"/> -->
+
+    </node>
+
+
+    <node name="tf_maptoodom_publisher" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 map odom 10" />
+
+    <node name="pose_publisher" pkg="epochmini" type="pose_publisher" />   
+
+</launch>

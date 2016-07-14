@@ -80,7 +80,7 @@ int main(int argc, char **argv)
    * buffer up before throwing some away.
    */
 // %Tag(PUBLISHER)%
-  ros::Publisher pose1_pub = n.advertise<geometry_msgs::PoseStamped>("pose1", 50);
+  ros::Publisher pose1_pub = n.advertise<geometry_msgs::PoseStamped>("pose1", 1000);
 // %EndTag(PUBLISHER)%
 
 //Initialize Sample position
@@ -99,7 +99,7 @@ current_time = ros::Time::now();
 last_time = ros::Time::now();
 
 // %Tag(LOOP_RATE)%
-  ros::Rate loop_rate(1.0);
+  ros::Rate loop_rate(10.0);
 // %EndTag(LOOP_RATE)%
 
   /**
@@ -148,7 +148,7 @@ last_time = ros::Time::now();
 //Format Publishing
 
     geometry_msgs::PoseStamped pose1;
-    pose1.header.frame_id = "map";
+    pose1.header.frame_id = "odom";
     pose1.pose.position.x = x;
     pose1.pose.position.y = y;
     pose1.pose.position.z = 0;

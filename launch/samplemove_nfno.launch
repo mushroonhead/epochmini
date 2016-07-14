@@ -1,0 +1,16 @@
+<launch>
+	<node name="sampleimugpspublisherSVY21" pkg="epochmini" type="sampleimugpspublisherSVY21.py" />
+
+	<node name="nofilter_pose_publisher" pkg="epochmini" type="nofilter_pose_publisher" />
+
+	<node name="goalpublisher" pkg="epochmini" type="goalpublisher" />
+
+	<node name="tf_worldtobase_goal" pkg="epochmini" type="tf_worldtobase_goal" />
+
+	<node name="tf_worldtobase_twist" pkg="epochmini" type="tf_worldtobase_twist" />
+
+	<node name="purepursuit1" pkg="epochmini" type="purepursuit1" />
+
+	<node name="simplepid1" pkg="epochmini" type="simplepid1" />
+
+</launch>

@@ -1,0 +1,15 @@
+<launch>
+	<node name="GPSSample" pkg="epochmini" type="GPSSample.py" />
+
+	<node name="neato_laser_publisher" pkg="xv_11_laser_driver" type="neato_laser_publisher">
+		<param name="port" value="/dev/ttyACM1" type="str" />
+		<param name="firmware_version" value="2" type="int" />
+	</node>
+
+	<node name="tf_odomtoboat_publisher" pkg="epochmini" type="tf_odom_GPSBoat" />
+	
+	<node name="tf_maptoodom_publisher" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 map odom 10" />
+
+	<node name="tf_boattoneato_publisher" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 boat_GPS neato_laser 10" />
+
+</launch>

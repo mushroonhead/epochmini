@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 2.8.3)
 project(epochmini)
 
@@ -11,6 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   sensor_msgs
   tf
+  sensor_msgs
+  nav_msgs
+  message_filters
 )
 
 ## System dependencies are found with CMake's conventions
@@ -19,8 +23,9 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
-## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+## See http://ros.org/doc/api/catkin/html/user_guide/
+##setup_dot_py.html
+##catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -105,7 +110,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES epochmini
-#  CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs sensor_msgs tf
+#  CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs sensor_msgs tf nav_msgs message_filters
 #  DEPENDS system_lib
 )
 
@@ -147,6 +152,33 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(samplepose src/samplepose.cpp)
 target_link_libraries(samplepose ${catkin_LIBRARIES})
 add_dependencies(samplepose epochmini_generate_messages_cpp)
+
+add_executable(tf_odom_GPSBoat src/tf_odom_GPSBoat.cpp)
+target_link_libraries(tf_odom_GPSBoat  ${catkin_LIBRARIES})
+
+add_executable(pose_publisher src/pose_publisher.cpp)
+target_link_libraries(pose_publisher  ${catkin_LIBRARIES})
+
+add_executable(tf_imutobasestablized_publisher src/tf_imutobasestablized_publisher.cpp)
+target_link_libraries(tf_imutobasestablized_publisher  ${catkin_LIBRARIES})
+
+add_executable(purepursuit1 src/purepursuit1.cpp)
+target_link_libraries(purepursuit1  ${catkin_LIBRARIES})
+
+add_executable(nofilter_pose_publisher src/nofilter_pose_publisher.cpp)
+target_link_libraries(nofilter_pose_publisher  ${catkin_LIBRARIES})
+
+add_executable(tf_worldtobase_goal src/tf_worldtobase_goal.cpp)
+target_link_libraries(tf_worldtobase_goal  ${catkin_LIBRARIES})
+
+add_executable(goalpublisher src/goalpublisher.cpp)
+target_link_libraries(goalpublisher  ${catkin_LIBRARIES})
+
+add_executable(tf_worldtobase_twist src/tf_worldtobase_twist.cpp)
+target_link_libraries(tf_worldtobase_twist  ${catkin_LIBRARIES})
+
+add_executable(simplepid1 src/simplepid1.cpp)
+target_link_libraries(simplepid1  ${catkin_LIBRARIES})
 
 #############
 ## Install ##
