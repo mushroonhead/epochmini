@@ -9,7 +9,7 @@ public:
 	SubscribeAndPublish()
 	{
 		//Topic you want to publish
-		//pub = n.advertise<std_msgs::Float64MultiArray>("motorAnalogOutputs", 1000);
+		pub = n.advertise<std_msgs::Float64MultiArray>("motorVoltageOut", 1000);
 
 		//Topic you want to subscribe
 		subvel = n.subscribe("base_link/Twist", 1000, &SubscribeAndPublish::velCallback, this);
@@ -42,6 +42,19 @@ public:
 		float Verror_right = Kp*epr+Ki*eir+Kd*edr;
 		V_left += Verror_left;
 		V_right += Verror_right;
+
+		std_msgs::Float64MultiArray Vout;
+		std_msgs::MultiArrayDimension m;
+		m.label = "desiredVoltage";
+		m.size = 2;
+		m.stride = 2;
+		Vout.layout.dim.clear();
+		Vout.layout.dim.push_back(m);
+		Vout.layout.data_offset = 0;
+		Vout.data.clear();
+		Vout.data.push_back(V_left);
+		Vout.data.push_back(V_right);
+		pub.publish(Vout);
 		ROS_INFO("Voltage: Vl=%f, Vr=%f, C_Vel: vl= %f, vr =%f, D_Vel: vl=%f vr=%f", 
 			V_left, V_right, currentVel_left, currentVel_right, 
 			desired_left_velocity, desired_right_velocity);
@@ -49,7 +62,7 @@ public:
 
 private:
 	ros::NodeHandle n; 
-	//ros::Publisher pub;
+	ros::Publisher pub;
 	ros::Subscriber subvel;
 	ros::Subscriber subdesired;
 
