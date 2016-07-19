@@ -1,7 +1,8 @@
 digraph G {
-"world" -> "base_link"[label="Broadcaster: /nofilter_pose_publisher\nAverage rate: 99.608 Hz\nMost recent transform: 1468249145.385 ( 0.010 sec old)\nBuffer length: 4.929 sec\n"];
+"map" -> "odom"[label="Broadcaster: /tf_maptoodom_publisher\nAverage rate: 97.522 Hz\nMost recent transform: 1468953334.823 ( -0.003 sec old)\nBuffer length: 4.932 sec\n"];
+"odom" -> "base_link"[label="Broadcaster: /ukf_localization\nAverage rate: 30.204 Hz\nMost recent transform: 1468953334.789 ( 0.032 sec old)\nBuffer length: 4.900 sec\n"];
 edge [style=invis];
  subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
-"Recorded at time: 1468249145.395"[ shape=plaintext ] ;
- }->"world";
+"Recorded at time: 1468953334.821"[ shape=plaintext ] ;
+ }->"map";
 }
