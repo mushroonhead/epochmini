@@ -11,7 +11,6 @@ import traceback
 
 accel_scale = 9.81*4.0/1024.0
 gyro_scale = 1.0/14.375
-pi = 3.14159265359
 
 ##Conversion to SVY21 from GPS Provided by cgcai @https://github.com/cgcai/SVY21
 class SVY21:
@@ -209,7 +208,7 @@ def talker():
 					ne = svy.computeSVY21(float_list[0],float_list[1])
 					##print ne
 					poseGPS = PoseWithCovarianceStamped()
-					poseGPS.header.frame_id = "odom"
+					poseGPS.header.frame_id = "world"
 					poseGPS.header.stamp = rospy.Time.now()
 					poseGPS.pose.pose.position.x = ne[1]
 					poseGPS.pose.pose.position.y = ne[0]
@@ -230,7 +229,7 @@ def talker():
 						if abs(dx) == 0.0 and abs(dy) == 0.0:
 							direction = 0.0
 						else: direction = math.atan2(dy,dx)
-						if direction < 0.0: direction += 2.0*pi
+						if direction < 0.0: direction += 2.0*math.pi
 						heading_diff = latest_yaw - direction
 						x_boat = float_list[3]*math.cos(heading_diff)
 						y_boat = float_list[3]*math.sin(heading_diff)
