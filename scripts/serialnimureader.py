@@ -2,57 +2,33 @@
 import serial
 import rospy
 from std_msgs.msg import String
-from sensor_msgs.msg import NavSatFix
 from sensor_msgs.msg import Imu
-from geometry_msgs.msg import TwistWithCovarianceStamped
 import tf
 import math
 
 accel_scale = 9.81*4.0/1024.0
 gyro_scale = 1.0/14.375
 knots = 0.514444
-float latest_yaw;
+oldTime = rospy.Time()
 
 def talker():
-	pubGPS = rospy.Publisher('poseGPS', NavSatFix, queue_size=1000)
+	global oldTime
+	pubString = rospy.Publisher('sensor/string', String, queue_size=1000)
 	pubIMU = rospy.Publisher('imuBoat', Imu, queue_size=1000)
-	pubTwist = rospy.Publisher('twistGPS', TwistWithCovarianceStamped, queue_size=1000)
-	rospy.init_node('imugpspublisher', anonymous=True)
+	rospy.init_node('sensornimureader', anonymous=True)
 	rate = rospy.Rate(100) # 100hz
 	while not rospy.is_shutdown():
-		data = ser.readline()
-		if data[0] == 'Z':
-			data = data.replace("Z","").replace("\n","").replace("\r","")
-			data_list = data.split(',')
-			if len(data_list) == 4:
-				try:
-					##data_list structure: lat, lon, heading, vel 
-					float_list = [float(i) for i in data_list]
-					poseGPS = NavSatFix()
-					poseGPS.header.frame_id = "world"
-					poseGPS.header.stamp = rospy.Time.now()
-					poseGPS.status.status = 0
-					poseGPS.status.service = 1
-					poseGPS.latitude = float_list[0]
-					poseGPS.longitude = float_list[1]
-					poseGPS.altitude = 0.0
-					poseGPS.position_covariance = [3.24, 0, 0, 0, 3,24, 0, 0, 0, 0]
-					poseGPS.position_covariance_type = 2
-					pubGPS.publish(poseGPS)
-					twistGPS = TwistWithCovarianceStamped()
-					twistGPS.header = poseGPS.header
-					twistGPS.twist.twist.linear.x = float_list[3]*knots*math.cos(latest_yaw)
-					twistGPS.twist.twist.linear.y = float_list[3]*knots*math.sin(latest_yaw)
-					twistGPS.twist.twist.linear.z = 0.0
-					##angular data not used here
-					twistGPS.twist.covariance = [0.01, 0.01, 0, 0, 0, 0]
-					pubTwist.publish(twistGPS)
-					log = "GPS Data: %f %f %f %f Publish at Time: %s" % (float_list[0], float_list[1], float_list[2], float_list[3], rospy.get_time())
-				except: log = "GPS Data Error! Data :  %s" % data
-			else:
-				log = "GPS Data Error! Data :  %s" % data
-			rospy.loginfo(log)
-		elif data[0] == 'Y':
+		# sample data
+		currentTime = rospy.Time.now()
+		timeCheck = currentTime.to_sec() - oldTime.to_sec()
+		print timeCheck
+		if (timeCheck) > 2.0:
+			data = 'Z1.341725,103.965008,1.5100,0.0000'
+			oldTime = currentTime;
+		else: data = 'Y0.0000,0.0730,255.4516,1.5100,0.0000,0.0000,0.000,0.000,0.000'
+		# data = ser.readline()
+		pubString.publish(data)
+		if data[0] == 'Y':
 			data = data.replace("Y","").replace("\n","").replace("\r","")
 			data_list = data.split(',')
 			if len(data_list) == 9:
@@ -62,7 +38,6 @@ def talker():
 					imuData = Imu()
 					imuData.header.frame_id = "base_link"
 					imuData.header.stamp = rospy.Time.now()
-					latest_yaw = float_list[3]
 					##data form in yaw, pitch, roll
 					quat = tf.transformations.quaternion_from_euler(float_list[3], float_list[4], float_list[5], 'rzyx')
 					imuData.orientation.x = quat[0]
@@ -86,22 +61,11 @@ def talker():
 				except: log = "IMU Data Error! Data :  %s" % data
 			else: log = "Data Error! Data :  %s" % data
 			rospy.loginfo(log)
-		else:
-			log = "Data Error or Message: %s" % data
-			rospy.loginfo(log)
 		rate.sleep()
 
+		
 if __name__ == '__main__':
-	print 'Initiating: Trying to Reach Arduino'
-	try:
-		try:
-			ser = serial.Serial('/dev/ttyACM0', 57600);
-			print "serial ttyACM0"
-		except:	
-			ser = serial.Serial('/dev/ttyACM1', 57600);
-			print "serial ttyACM1"
-		print 'Test'
-		talker()
+	try: talker()
 	except rospy.ROSInterupptException:
 		print 'Ros talker failed'
 		pass

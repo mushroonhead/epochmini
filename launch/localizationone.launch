@@ -1,10 +1,16 @@
 <launch>
     <!--Localization Module Fusing IMU with GPS Data. Not recommended but required due to lack of odom data-->
 
-    <node name="imugpspublisherSVY21" pkg="epochmini" type="imugpspublisherSVY21.py" />
+    <node name="sampleimugpspublisherSVY21" pkg="epochmini" type="sampleimugpspublisherSVY21.py" />
+
+<!--     <node name="serialnimureader" pkg="epochmini" type="serialnimureader.py" />
+
+    <node name="gpsnavstatpublisher" pkg="epochmini" type="gpsnavstatpublisher.py" />
+
+    <node name="gpstwistpublisher" pkg="epochmini" type="gpstwistpublisher.py" /> -->
 
     <node pkg="robot_localization" type="ukf_localization_node" name="ukf_localization" clear_params="true">
-      <remap from="odometry/filtered" to="odom/filtered"/>
+      <remap from="odometry/filtered" to="odom/ukf"/>
 
       <param name="frequency" value="30"/>
       <param name="sensor_timeout" value="0.1"/>

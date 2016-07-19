@@ -11,16 +11,26 @@ import math
 accel_scale = 9.81*4.0/1024.0
 gyro_scale = 1.0/14.375
 knots = 0.514444
-float latest_yaw;
+latest_yaw = 0.0
+oldTime = rospy.Time()
 
 def talker():
+	global oldTime
 	pubGPS = rospy.Publisher('poseGPS', NavSatFix, queue_size=1000)
 	pubIMU = rospy.Publisher('imuBoat', Imu, queue_size=1000)
 	pubTwist = rospy.Publisher('twistGPS', TwistWithCovarianceStamped, queue_size=1000)
 	rospy.init_node('imugpspublisher', anonymous=True)
 	rate = rospy.Rate(100) # 100hz
 	while not rospy.is_shutdown():
-		data = ser.readline()
+		# sample data
+		currentTime = rospy.Time.now()
+		timeCheck = currentTime.to_sec() - oldTime.to_sec()
+		print timeCheck
+		if (timeCheck) > 2.0:
+			data = 'Z1.341725,103.965008,1.5100,0.0000'
+			oldTime = currentTime;
+		else: data = 'Y0.0000,0.0730,255.4516,1.5100,0.0000,0.0000,0.000,0.000,0.000'
+		# data = ser.readline()
 		if data[0] == 'Z':
 			data = data.replace("Z","").replace("\n","").replace("\r","")
 			data_list = data.split(',')
@@ -38,7 +48,19 @@ def talker():
 					poseGPS.altitude = 0.0
 					poseGPS.position_covariance = [3.24, 0, 0, 0, 3,24, 0, 0, 0, 0]
 					poseGPS.position_covariance_type = 2
-					pubGPS.publish(poseGPS)
+					try: 
+						pubGPS.publish(poseGPS)
+						log = "GPS Pose Data: %f %f Publish at Time: %s" % (float_list[0], float_list[1], rospy.get_time())
+					except: 
+						log = "poseGPS Publisher Error"
+					rospy.loginfo(log)
+
+				except: 
+					log = "GPS Data Error! Data :  %s" % data
+					rospy.loginfo(log)
+				rate.sleep()
+				
+				try:
 					twistGPS = TwistWithCovarianceStamped()
 					twistGPS.header = poseGPS.header
 					twistGPS.twist.twist.linear.x = float_list[3]*knots*math.cos(latest_yaw)
@@ -46,11 +68,17 @@ def talker():
 					twistGPS.twist.twist.linear.z = 0.0
 					##angular data not used here
 					twistGPS.twist.covariance = [0.01, 0.01, 0, 0, 0, 0]
-					pubTwist.publish(twistGPS)
-					log = "GPS Data: %f %f %f %f Publish at Time: %s" % (float_list[0], float_list[1], float_list[2], float_list[3], rospy.get_time())
-				except: log = "GPS Data Error! Data :  %s" % data
+					try:
+						pubTwist.publish(twistGPS)
+						log = "GPS Twist Data: %f %f Publish at Time: %s" % (twistGPS.twist.twist.linear.x, twistGPS.twist.twist.linear.y, rospy.get_time())
+					except: log = "twistGPS Publisher Error"
+
+				except: 
+					log = "GPS Twist Error! Data :  %s" % data
+					rospy.loginfo(log)
+				
 			else:
-				log = "GPS Data Error! Data :  %s" % data
+				log = "GPS Data List Wrong! Data :  %s" % data
 			rospy.loginfo(log)
 		elif data[0] == 'Y':
 			data = data.replace("Y","").replace("\n","").replace("\r","")
@@ -92,16 +120,7 @@ def talker():
 		rate.sleep()
 
 if __name__ == '__main__':
-	print 'Initiating: Trying to Reach Arduino'
-	try:
-		try:
-			ser = serial.Serial('/dev/ttyACM0', 57600);
-			print "serial ttyACM0"
-		except:	
-			ser = serial.Serial('/dev/ttyACM1', 57600);
-			print "serial ttyACM1"
-		print 'Test'
-		talker()
+	try: talker()
 	except rospy.ROSInterupptException:
 		print 'Ros talker failed'
 		pass

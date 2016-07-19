@@ -173,6 +173,7 @@ svy = SVY21()
 oldPose = PoseWithCovarianceStamped()
 oldPose.header.stamp = rospy.Time()
 oldTime = rospy.Time()
+latest_yaw = 0.0
 
 def talker():
 	global oldPose
@@ -219,7 +220,7 @@ def talker():
 					timeDiff = poseGPS.header.stamp.to_sec() - oldPose.header.stamp.to_sec()
 					if timeDiff < 3.0:
 						twistGPS = TwistWithCovarianceStamped()
-						twistGPS.header.frame_id = "odom"
+						twistGPS.header.frame_id = "base_link"
 						twistGPS.header.stamp = poseGPS.header.stamp
 						twistGPS.twist.twist.linear.x = (poseGPS.pose.pose.position.x - oldPose.pose.pose.position.x)/timeDiff
 						twistGPS.twist.twist.linear.y = (poseGPS.pose.pose.position.y - oldPose.pose.pose.position.y)/timeDiff
@@ -243,6 +244,7 @@ def talker():
 					imuData = Imu()
 					imuData.header.frame_id = "base_link"
 					imuData.header.stamp = rospy.Time.now()
+					latest_yaw = float_list[3]
 					quat = tf.transformations.quaternion_from_euler(float_list[3], float_list[4], float_list[5], 'rzyx')
 					imuData.orientation.x = quat[0]
 					imuData.orientation.y = quat[1]
