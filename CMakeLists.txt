@@ -183,6 +183,11 @@ target_link_libraries(tf_worldtobase_twist  ${catkin_LIBRARIES})
 add_executable(simplepid1 src/simplepid1.cpp)
 target_link_libraries(simplepid1  ${catkin_LIBRARIES})
 
+add_executable(pidtuning src/pidtuning.cpp)
+target_link_libraries(pidtuning  ${catkin_LIBRARIES})
+
+add_executable(purepursuittuning src/purepursuittuning.cpp)
+target_link_libraries(purepursuittuning  ${catkin_LIBRARIES})
 
 
 #############

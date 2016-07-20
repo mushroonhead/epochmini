@@ -14,6 +14,7 @@ public:
 
 		//Topic you want to subscribe
 		sub = n.subscribe("base_link/desiredPose", 1000, &SubscribeAndPublish::goalCallback, this);
+		subinp = n.subscribe("user_input/purepursuit", 10, &SubscribeAndPublish::inpCallback, this);
 	}
 
 	void goalCallback(const geometry_msgs::PoseStamped::ConstPtr& goal) {
@@ -28,11 +29,12 @@ public:
 		//linear velocity in ms^-1, angular velocity in rads^-1 +ve clockwise
 		//for calculation refer to documentation on pure pursuit
 		double desired_linear_vel, desired_angular_vel, angDesired;
-		double ka, kv, max_av, max_lv;
-		ka = 0.5; //constant for ang, to be tuned
-		max_av = 2.0; //max limit for ang_vel
-		kv = 0.5; //constant for dist traveled, to be tuned
-		max_lv = 3.0; //max limit for lin_vel
+		if (state!= 1) {//no input yet go to defaults
+			ka = 0.5; //constant for ang, to be tuned
+			max_av = 2.0; //max limit for ang_vel
+			kv = 0.5; //constant for dist traveled, to be tuned
+			max_lv = 3.0; //max limit for lin_vel
+		}
 		if (abs(goal->pose.position.x) == 0.00 and abs(goal->pose.position.y) == 0.00){
 			//no goal input yet
 			desired_linear_vel = 0.0;
@@ -85,10 +87,23 @@ public:
 			goal->pose.position.x, goal->pose.position.y, desired_linear_vel, desired_angular_vel);
 	}
 
+	void inpCallback(const std_msgs::Float64MultiArray::ConstPtr& inp) {
+		//wirelessly update Kp, Ki, Kd values by running specific node
+		state = 1;
+		ka = inp->data[0];
+		max_av = inp->data[1];
+		kv = inp->data[2];
+		max_lv = inp->data[3];
+	}
+
 private:
 	ros::NodeHandle n; 
 	ros::Publisher pub;
 	ros::Subscriber sub;
+	ros::Subscriber subinp;
+	int state;
+
+	double ka, kv, max_av, max_lv;//to be tuned
 
 };
 
