@@ -1,6 +1,6 @@
 <launch>
 
-    <node name="sampleimugpspublisher2SVY21" pkg="epochmini" type="sampleimugpspublisher2SVY21.py" />
+    <node name="imugpspublisher2SVY21" pkg="epochmini" type="sampleimugpspublisher2SVY21.py" />
 
     <node pkg="robot_localization" type="ukf_localization_node" name="ukf_odom" clear_params="true">
       <remap from="odometry/filtered" to="odom/ukf"/>
@@ -26,7 +26,7 @@
                                      true,  true,  false]</rosparam>
 
       <rosparam param="odom0_config">[false, false,  false,
-                                      false, false, false,
+                                      false, false, true,
                                       true, true, false,
                                       false, false, true,
                                       false, false, false]</rosparam>
@@ -112,7 +112,7 @@
                                      true,  true,  false]</rosparam>
 
       <rosparam param="odom0_config">[false, false,  false,
-                                      false, false, false,
+                                      false, false, true,
                                       true, true, false,
                                       false, false, true,
                                       false, false, false]</rosparam>
@@ -125,10 +125,10 @@
 
       <param name="imu0_differential" value="false"/>
       <param name="odom0_differential" value="true"/>
-      <param name="pose0_differential" value="true"/>
+      <param name="pose0_differential" value="false"/>
       
-      <param name="imu0_relative" value="true"/>
-      <param name="odom0_relative" value="false"/>
+      <param name="imu0_relative" value="false"/>
+      <param name="odom0_relative" value="true"/>
       <param name="pose0_relative" value="false"/>
 
       <param name="imu0_remove_gravitational_acceleration" value="true"/>
