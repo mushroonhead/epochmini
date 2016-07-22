@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <std_msgs/Float64MultiArray.h>
-#include <std_msgs/Int32MultiArray.h>
+#include <std_msgs/UInt16.h>
 #include <cmath>
 
 class SubscribeAndPublish
@@ -10,7 +10,8 @@ public:
 	SubscribeAndPublish()
 	{
 		//Topic you want to publish
-		pub = n.advertise<std_msgs::Int32MultiArray>("motorVoltageOut", 1000);
+		publeft = n.advertise<std_msgs::UInt16>("motorVoltageLeft", 1000);
+		pubright = n.advertise<std_msgs::UInt16>("motorVoltageRight", 1000);
 
 		//Topic you want to subscribe
 		subvel = n.subscribe("base_link/Twist", 1000, &SubscribeAndPublish::velCallback, this);
@@ -45,29 +46,22 @@ public:
 		if (V_left > 127){
 			V_left = 127;
 		}
-		else if (V_left < -127){
-			V_left = -127;
+		else if (V_left < 1){
+			V_left = 1;
 		}
 		V_right += int(Verror_right);
 		if (V_right > 127){
 			V_right = 127;
 		}
-		else if (V_right < -127){
-			V_right = -127;
+		else if (V_right < 1){
+			V_right = 1;
 		}
 
-		std_msgs::Int32MultiArray Vout;
-		std_msgs::MultiArrayDimension m;
-		m.label = "desiredVoltage";
-		m.size = 2;
-		m.stride = 2;
-		Vout.layout.dim.clear();
-		Vout.layout.dim.push_back(m);
-		Vout.layout.data_offset = 0;
-		Vout.data.clear();
-		Vout.data.push_back(V_left);
-		Vout.data.push_back(V_right);
-		pub.publish(Vout);
+		std_msgs::UInt16 Vout_left, Vout_right;
+		Vout_left.data = V_left;
+		Vout_right.data = V_right;
+		publeft.publish(Vout_left);
+		pubright.publish(Vout_right);
 		ROS_INFO("Voltage: Vl=%d, Vr=%d, C_Vel: vl= %f, vr =%f, D_Vel: vl=%f vr=%f", 
 			V_left, V_right, currentVel_left, currentVel_right, 
 			desired_left_velocity, desired_right_velocity);
@@ -79,11 +73,13 @@ public:
 		Kp = inp->data[0];
 		Ki = inp->data[1];
 		Kd = inp->data[2];
+		ROS_INFO("Update PID Values: Kp=%f, Ki=%f, Kd=%f", Kp, Ki, Kd);
 	}
 
 private:
 	ros::NodeHandle n; 
-	ros::Publisher pub;
+	ros::Publisher publeft;
+	ros::Publisher pubright;
 	ros::Subscriber subvel;
 	ros::Subscriber subdesired;
 	ros::Subscriber subinput;

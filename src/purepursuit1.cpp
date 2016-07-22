@@ -63,6 +63,7 @@ public:
 			//any other case, to check for mathematical uncertainties
 			double l_sqr, r, d;
 			l_sqr = pow(goal->pose.position.x, 2) + pow(goal->pose.position.y, 2);
+			desired_linear_vel = kv*sqrt(l_sqr);
 			r = l_sqr/(2*goal->pose.position.x);
 			d = r-goal->pose.position.x;
 			if (goal->pose.position.x <0){
@@ -94,6 +95,8 @@ public:
 		max_av = inp->data[1];
 		kv = inp->data[2];
 		max_lv = inp->data[3];
+		ROS_INFO("Updated PurePursuit Constraints: ka=%f, max_av=%f, kv=%f, max_lv=%f",
+			ka, max_av, kv, max_lv);
 	}
 
 private:
