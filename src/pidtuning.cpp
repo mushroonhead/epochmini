@@ -11,9 +11,11 @@ int main(int argc, char** argv){
 	ros::Rate loop_rate(10);
 
 	//define the values you want here
-	float Kp = 1.5;
+	//current value chosen due to high update rate of pid
+	//but low update rate of velocity (TBC)
+	float Kp = 0.5;
 	float Ki = 0.0;
-	float Kd = 1.5;
+	float Kd = 0.5;
 
 	while (ros::ok()){
 		std_msgs::Float64MultiArray inp;

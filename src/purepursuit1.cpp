@@ -28,31 +28,39 @@ public:
 		desiredSpeed.layout.data_offset = 0;
 		//linear velocity in ms^-1, angular velocity in rads^-1 +ve clockwise
 		//for calculation refer to documentation on pure pursuit
+		printf("x=%f, y=%f \n", goal->pose.position.x, goal->pose.position.y);
 		double desired_linear_vel, desired_angular_vel, angDesired;
 		if (state!= 1) {//no input yet go to defaults
 			ka = 0.5; //constant for ang, to be tuned
 			max_av = 2.0; //max limit for ang_vel
 			kv = 0.5; //constant for dist traveled, to be tuned
 			max_lv = 3.0; //max limit for lin_vel
+			state = 1;
 		}
-		if (abs(goal->pose.position.x) == 0.00 and abs(goal->pose.position.y) == 0.00){
+		if (fabs(goal->pose.position.x) < 0.1 and fabs(goal->pose.position.y) < 0.1){
+			printf("%s\n", "Case 1");
 			//no goal input yet
 			desired_linear_vel = 0.0;
 			desired_angular_vel = 0.0;
 		}
-		else if (goal->pose.position.y < -1.0) {
+		else if (goal->pose.position.x < -1.0) {
+			printf("%s\n", "Case 2");
 			//for cases where the point is far behind the boat,
 			//prevent moving long distances backwards
 			desired_linear_vel = 0.0;
-			angDesired = -atan2(goal->pose.position.x,goal->pose.position.y);
+			angDesired = atan2(goal->pose.position.y,goal->pose.position.x);
+			printf("Desired Angle=%f\n", angDesired);
 			desired_angular_vel = ka*angDesired;
 			if (desired_angular_vel > max_av) {
 				desired_angular_vel = max_av;
 			}
 		}
-		else if (goal->pose.position.x/goal->pose.position.y <0.01) {
+		else if (fabs(goal->pose.position.y/goal->pose.position.x) < 0.1) {
+			printf("%s\n", "Case 3");
+			printf("%f\n", fabs((goal->pose.position.y)/(goal->pose.position.x)));
 			//for the case where R tends to infinity
 			double l = goal->pose.position.y;
+			printf("l=%f\n", l);
 			desired_linear_vel = kv*l;
 			if (desired_linear_vel > max_lv) {
 				desired_linear_vel = max_lv;
@@ -60,25 +68,37 @@ public:
 			desired_angular_vel = 0.0;
 		}	
 		else {
+			printf("%s\n", "Case 4");
 			//any other case, to check for mathematical uncertainties
-			double l_sqr, r, d;
-			l_sqr = pow(goal->pose.position.x, 2) + pow(goal->pose.position.y, 2);
-			desired_linear_vel = kv*sqrt(l_sqr);
-			r = l_sqr/(2*goal->pose.position.x);
-			d = r-goal->pose.position.x;
-			if (goal->pose.position.x <0){
-				//turn anticlockwise
-				angDesired = atan2(goal->pose.position.y,-d); 
+			double l_sqr, r, d, pp_x, pp_y;
+			//frame changed to match that of pure pursuit papers,
+			//ie right, front, up from front. left, up
+			pp_x = -goal->pose.position.y;
+			pp_y = goal->pose.position.x;
+			l_sqr = pow(pp_x, 2) + pow(pp_y, 2);
+			r = l_sqr/(2*pp_x); //only negative when turn is left
+			d = r-pp_x;
+			if (pp_x < 0){
+				//spin anticlockwise
+				angDesired = atan2(pp_y,-d); 
 			}
 			else {
-				//turn clockwise
-				angDesired = -atan2(goal->pose.position.y,d);
+				//spin clockwise
+				angDesired = -atan2(pp_y,d);
 			}
-			desired_linear_vel = kv*r*angDesired;
-			if (desired_linear_vel > max_lv) {
-				desired_linear_vel = max_lv;
+			desired_linear_vel = -kv*r*angDesired;
+			//tested all 4 cases, correct
+			if (fabs(desired_linear_vel) > max_lv) {
+				if (desired_linear_vel < 0){
+					desired_linear_vel = -max_lv;
+				}
+				else {
+					desired_linear_vel = max_lv;
+				}
 			}
-			desired_angular_vel = desired_linear_vel/r;
+			desired_angular_vel = -desired_linear_vel/r;
+			//test all 4 cases, correct
+			printf("l_sqr=%f, r=%f, d=%f, angDesired=%f \n", l_sqr, r, d, angDesired);
 		}
 		desiredSpeed.data.clear();
 		desiredSpeed.data.push_back(desired_linear_vel);

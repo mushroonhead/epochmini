@@ -33,37 +33,42 @@ public:
 		desired_angular_vel = vel_list->data[1];
 		desired_left_velocity = desired_linear_vel - l*desired_angular_vel;
 		desired_right_velocity = desired_linear_vel + l*desired_angular_vel;
-		if (state != 1) { //ie no inp detected, go to default
-			Kp = 1.5; Ki = 0.0; Kd = 1.5; //default values
+		if (state != 1) { //ie values not initiated, go to default
+			Kp = 0.5; Ki = 0.0; Kd = 0.5, V_left = 63.5, V_right = 63.5, state = 1; 
+			//default values and marked init
 		}
-		epl = currentVel_left - desired_left_velocity;
-		epr = currentVel_right - desired_right_velocity;
+		epl = desired_left_velocity - currentVel_left;
+		epr = desired_right_velocity - currentVel_right;
 		eil += epl; eir += epr;
 		edl = epl - epl_old; edr = epr - epr_old;
 		float Verror_left = Kp*epl+Ki*eil+Kd*edl;
 		float Verror_right = Kp*epr+Ki*eir+Kd*edr;
-		V_left += int(Verror_left);
-		if (V_left > 127){
-			V_left = 127;
+		printf("epl=%f, eil=%f, edl=%f, epr=%f, eir=%f, edr=%f\n", 
+			epl, eil, edl, epr, eir, edr);
+		printf("Verror_left=%f, Verror_right=%f, V_left=%f, V_right=%f\n", 
+			Verror_left, Verror_right, V_left, V_right);
+		V_left += Verror_left;
+		if (V_left > 127.0){
+			V_left = 127.0;
 		}
-		else if (V_left < 1){
-			V_left = 1;
+		else if (V_left < 1.0){
+			V_left = 1.0;
 		}
-		V_right += int(Verror_right);
-		if (V_right > 127){
-			V_right = 127;
+		V_right += Verror_right;
+		if (V_right > 127.0){
+			V_right = 127.0;
 		}
-		else if (V_right < 1){
-			V_right = 1;
+		else if (V_right < 1.0){
+			V_right = 1.0;
 		}
 
 		std_msgs::UInt16 Vout_left, Vout_right;
-		Vout_left.data = V_left;
-		Vout_right.data = V_right;
+		Vout_left.data = int(V_left);
+		Vout_right.data = int(V_right);
 		publeft.publish(Vout_left);
 		pubright.publish(Vout_right);
 		ROS_INFO("Voltage: Vl=%d, Vr=%d, C_Vel: vl= %f, vr =%f, D_Vel: vl=%f vr=%f", 
-			V_left, V_right, currentVel_left, currentVel_right, 
+			int(V_left), int(V_right), currentVel_left, currentVel_right, 
 			desired_left_velocity, desired_right_velocity);
 	}
 
@@ -86,7 +91,7 @@ private:
 
 	float epl, eil, edl, epl_old;
 	float epr, eir, edr, epr_old;
-	int V_left, V_right;
+	float V_left, V_right;
 	float currentVel_left, currentVel_right;
 	int state;
 
@@ -95,8 +100,8 @@ private:
 };
 
 int main(int argc, char** argv){
-	ros::init(argc, argv, "purepursuit1");
-	SubscribeAndPublish purepursuit1;
+	ros::init(argc, argv, "simplepid1");
+	SubscribeAndPublish simplepid1;
 
 	ros::spin();
 	
