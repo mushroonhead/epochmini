@@ -13,6 +13,6 @@
 
 	<node name="simplepid1" pkg="epochmini" type="simplepid1" />
 
-	<node name="rosserial_arduino" pkg="rosserial_python" type="serial_node.py" args="/dev/ttyACM1" />
+	<node name="rosserial_arduino" pkg="rosserial_python" type="serial_node.py" args="/dev/ttyACM0" />
 
 </launch>

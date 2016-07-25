@@ -155,8 +155,7 @@
       <param name="imu0_linear_acceleration_rejection_threshold" value="0.1"/>
       <param name="odom0_pose_rejection_threshold" value="5"/>
       <param name="odom0_twist_rejection_threshold" value="1"/>
-      <param name="imu0_pose_rejection_threshold" value="0.3"/>
-
+  
       <!-- Debug settings. Not for the faint of heart. Outputs a ludicrous amount of information to the file
            specified by debug_out_file. I hope you like matrices! Defaults to false if unspecified. -->
       <param name="debug"           value="false"/>

@@ -3,15 +3,13 @@
 
 	<node name="nofilter_pose_publisher" pkg="epochmini" type="nofilter_pose_publisher" />
 
-	<node name="goalpublisher" pkg="epochmini" type="goalpublisher" />
+	<node name="goalpublisher2" pkg="epochmini" type="goalpublisher2" />
 
 	<node name="tf_worldtobase_goal" pkg="epochmini" type="tf_worldtobase_goal" />
 
-	<node name="tf_worldtobase_twist" pkg="epochmini" type="tf_worldtobase_twist" />
-
 	<node name="purepursuit1" pkg="epochmini" type="purepursuit1" />
 
-	<node name="simplepid1" pkg="epochmini" type="simplepid1" />
+	<node name="simplepid2" pkg="epochmini" type="simplepid2" />
 
 	<node name="rosserial_arduino" pkg="rosserial_python" type="serial_node.py" args="/dev/ttyACM1" />
 

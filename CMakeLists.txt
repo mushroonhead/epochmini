@@ -189,6 +189,11 @@ target_link_libraries(pidtuning  ${catkin_LIBRARIES})
 add_executable(purepursuittuning src/purepursuittuning.cpp)
 target_link_libraries(purepursuittuning  ${catkin_LIBRARIES})
 
+add_executable(goalpublisher2 src/goalpublisher2.cpp)
+target_link_libraries(goalpublisher2  ${catkin_LIBRARIES})
+
+add_executable(simplepid2 src/simplepid2.cpp)
+target_link_libraries(simplepid2  ${catkin_LIBRARIES})
 
 #############
 ## Install ##
