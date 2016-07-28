@@ -1,5 +1,5 @@
 <launch>
-	<node name="sampleimugpspublisher2SVY21" pkg="epochmini" type="sampleimugpspublisher2SVY21.py" />
+	<node name="imugpspublisher2SVY21" pkg="epochmini" type="imugpspublisher2SVY21.py" />
 
 	<node name="nofilter_pose_publisher" pkg="epochmini" type="nofilter_pose_publisher" />
 
@@ -11,6 +11,6 @@
 
 	<node name="simplepid2" pkg="epochmini" type="simplepid2" />
 
-	<node name="rosserial_arduino" pkg="rosserial_python" type="serial_node.py" args="/dev/ttyACM0" />
+	<node name="rosserial_arduino" pkg="rosserial_python" type="serial_node.py" args="/dev/ttyACM1" />
 
 </launch>

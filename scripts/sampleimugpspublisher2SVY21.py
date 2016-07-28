@@ -193,7 +193,7 @@ def talker():
 	while not rospy.is_shutdown():
 		currentTime = rospy.Time.now()
 		timeCheck = currentTime.to_sec() - oldTime.to_sec()
-		if (timeCheck) > 2.0:
+		if (timeCheck) > 0.5:
 			data = 'Z1.341725,103.965008,1.5100,0.0000'
 			oldTime = currentTime;
 		else: data = 'Y0.0000,0.0730,255.4516,1.5100,0.0000,0.0000,0.000,0.000,0.000'
