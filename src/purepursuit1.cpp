@@ -59,7 +59,7 @@ public:
 			printf("%s\n", "Case 3");
 			printf("%f\n", fabs((goal->pose.position.y)/(goal->pose.position.x)));
 			//for the case where R tends to infinity
-			double l = goal->pose.position.y;
+			double l = goal->pose.position.x;
 			printf("l=%f\n", l);
 			desired_linear_vel = kv*l;
 			if (desired_linear_vel > max_lv) {

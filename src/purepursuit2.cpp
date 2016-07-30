@@ -43,7 +43,7 @@ public:
 			desired_linear_vel = 0.0;
 			desired_angular_vel = 0.0;
 		}
-		else if (goal->poses().last.pose.position.x < -1.0) {
+		else if (goal->poses.last().pose.position.x < -1.0) {
 			printf("%s\n", "Case 2");
 			//for cases where the point is far behind the boat,
 			//prevent moving long distances backwards
@@ -55,11 +55,11 @@ public:
 				desired_angular_vel = max_av;
 			}
 		}
-		else if (fabs(goal->poses.last().pose.position.y/goal->poses().last.pose.position.x) < 0.1) {
+		else if (fabs(goal->poses.last().pose.position.y/goal->poses.last().pose.position.x) < 0.1) {
 			printf("%s\n", "Case 3");
 			printf("%f\n", fabs((goal->poses.last().pose.position.y)/(goal->poses.last().pose.position.x)));
 			//for the case where R tends to infinity
-			double l = goal->poses.last().pose.position.y;
+			double l = goal->poses.last().pose.position.x;
 			printf("l=%f\n", l);
 			desired_linear_vel = kv*l;
 			if (desired_linear_vel > max_lv) {

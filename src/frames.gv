@@ -1,2 +1,7 @@
 digraph G {
-"no tf data recieved"}
+"world" -> "base_link"[label="Broadcaster: /nofilter_pose_publisher\nAverage rate: 41.127 Hz\nMost recent transform: 1469732651.974 ( 0.011 sec old)\nBuffer length: 4.936 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1469732651.985"[ shape=plaintext ] ;
+ }->"world";
+}
