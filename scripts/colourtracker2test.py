@@ -13,32 +13,22 @@ import numpy as np
 
 #from __future__ import print_function
 
-def main(args):
-	# fourcc = cv2.cv.CV_FOURCC(*'XVID')
-	# out = cv2.VideoWriter("output.avi", -1, 20, (640, 480))
 
-	#capturing video through webcam
-	cap=cv2.VideoCapture(0)
-	cap.set(3,640)
-	cap.set(4,480)
+class image_converter:
 
-	bridge = CvBridge()
+	def __init__(self):
+		self.image_pub = rospy.Publisher("processedComOutTwo", Image)
 
-	pubimg = rospy.Publisher("processedCamOutput",Image, queue_size = 10)
-	pubcap = rospy.Publisher("unprocessedCamOutput",Image, queue_size = 10)
-	pubobj = rospy.Publisher("detectedObject",Float32MultiArray, queue_size = 10)
-	rospy.init_node('colourtracker', anonymous=True)
-	rate = rospy.Rate(10) # 10hz
+		self.bridge = CvBridge()
+		self.image_subl = rospy.Subscriber("unprocessedCamOutput", Image, self.callback)
 
-	list_obj = []
+	def callback(self,data):
+		try:
+			img = self.bridge.imgmsg_to_cv2(data, "bgr8")
+		except CvBridgeError as e:
+			print (e)
 
-	while not rospy.is_shutdown():
-		
-		_, img = cap.read()
-		timeImg = rospy.Time()
-
-		image_unprocessed = bridge.cv2_to_imgmsg(img, "bgr8")
-		pubcap.publish(image_unprocessed)
+		list_obj = []
 
 		#converting frame to BGR to HSV
 
@@ -86,11 +76,16 @@ def main(args):
 			area = cv2.contourArea(contour)
 			if(area>5000):
 				x,y,w,h = cv2.boundingRect(contour) 
-				cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255),2)
-				cv2.putText(img,"Red color",(x,y),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255))
-				obj = [float(1), float(x+w/2), float(y+h/2), area] #identity 1 for red
-				list_obj = list_obj+obj
-				print ("Red in frame")
+				rect = cv2.minAreaRect(contour)
+				if  rect[1][0]/rect[1][1] < 2.0 and rect[1][0]/rect[1][1] > 0.5:
+					#box = cv2.boxPoints(rect)
+					#box = np.int0(box)
+					#cv2.drawContours(img,[box],(0,0,255),2)
+					cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255),2)
+					cv2.putText(img,"Red Obstacle",(x,y),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255))
+					obj = [float(1), float(x+w/2), float(y+h/2), area] #identity 1 for red
+					list_obj = list_obj+obj
+					print ("Detected RedObstacle at (%d,%d)" %(x+w/2, y+h/2))
 
 		#tracking Blue
 		(contours,hierarchy)=cv2.findContours(blue,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
@@ -98,12 +93,19 @@ def main(args):
 		for pic, contour in enumerate(contours):
 			area = cv2.contourArea(contour)
 			if(area>5000):
-				x,y,w,h = cv2.boundingRect(contour)
-				cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-				cv2.putText(img,"Blue color",(x,y),cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255,0,0))
-				obj = [float(2), float(x+w/2), float(y+h/2), area] #identity 2 for blue
-				list_obj = list_obj+obj
-				print ("Blue in frame")
+				x,y,w,h = cv2.boundingRect(contour) 
+				rect = cv2.minAreaRect(contour)
+				print rect[1][0]
+				print rect[1][1]
+				if rect[1][0]/rect[1][1] < 2.0 and rect[1][0]/rect[1][1] > 0.5: 
+					#box = cv2.cv.boxPoints(rect)
+					#box = np.int0(box)
+					#cv2.drawContours(img,[box],(0,0,255),2)
+					cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+					cv2.putText(img,"Blue Obstacle",(x,y),cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255,0,0))
+					obj = [float(2), float(x+w/2), float(y+h/2), area] #identity 2 for blue
+					list_obj = list_obj+obj
+					print ("Detected BlueObstacle at (%d,%d)" %(x+w/2, y+h/2))
 
 		# #tracking Yellow
 		# (_,contours,hierarchy)=cv2.findContours(yellow,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
@@ -148,18 +150,25 @@ def main(args):
 		for i in range(len(data.data)):
 			print data.data[i]
 			print type(data.data[i])
-	
-		image_output = bridge.cv2_to_imgmsg(img, "bgr8")
-		pubimg.publish(image_output)
-		pubobj.publish(data)
 
 		list_obj = []
-	
-		rate.sleep()
+
+		cv2.imshow("Image window", img)
+		cv2.waitKey(3)
+
+		try:
+			self.image_pub.publish(self.bridge.cv2_to_imgmsg(img, "bgr8"))
+		except CvBridgeError as e:
+			print (e)
+
+def main(args):
+	ic = image_converter()
+	rospy.init_node('colour_tracker_test', anonymous=True)
+	try:
+		rospy.spin()
+	except KeyboardInterrupt:
+		print("Shutting Down")
+	cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-	try:
-		main(sys.argv)
-	except rospy.ROSInterruptException:
-		print("Shutting down")
-		cv2.destroyAllWindows()
+	main(sys.argv)

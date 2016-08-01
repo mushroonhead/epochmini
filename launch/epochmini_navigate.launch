@@ -3,13 +3,13 @@
 
   <node name="nofilter_pose_publisher" pkg="epochmini" type="nofilter_pose_publisher" />
 
-  <!-- <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node" output="screen">
+  <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node" output="screen">
     <param name="host" value="192.168.0.12" />
-  </node> -->
+  </node>
 
-  <!-- <node name="tf_lasertobase_publisher" pkg="tf" type="static_transform_publisher" args="0.2 0 0 0 0 0 1 boat_GPS neato_laser 10" /> -->
+  <node name="tf_lasertobase_publisher" pkg="tf" type="static_transform_publisher" args="0.2 0 0 0 0 0 1 boat_GPS neato_laser 10" />
 
-  <!-- <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
     <remap from="scan" to="base_scan"/>
     <param name="map_update_interval" value="5.0"/>
     <param name="maxUrange" value="16.0"/>
@@ -40,7 +40,8 @@
     <param name="llsamplestep" value="0.01"/>
     <param name="lasamplerange" value="0.005"/>
     <param name="lasamplestep" value="0.005"/>
-  </node> -->
+  </node>
+
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <rosparam file="$(find epochmini)/navigation_params/epochmini/costmap_common_params.yaml" command="load" ns="global_costmap" />

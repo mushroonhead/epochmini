@@ -49,18 +49,18 @@ public:
 		printf("Verror_left=%f, Verror_right=%f, V_left=%f, V_right=%f\n", 
 			Verror_left, Verror_right, V_left, V_right);
 		V_left += Verror_left;
-		if (V_left > 127.0){
-			V_left = 127.0;
+		if (V_left > 100.0){
+			V_left = 100.0;
 		}
-		else if (V_left < 1.0){
-			V_left = 1.0;
+		else if (V_left < 27.0){
+			V_left = 27.0;
 		}
 		V_right += Verror_right;
-		if (V_right > 127.0){
-			V_right = 127.0;
+		if (V_right > 100.0){
+			V_right = 100.0;
 		}
-		else if (V_right < 1.0){
-			V_right = 1.0;
+		else if (V_right < 27.0){
+			V_right = 27.0;
 		}
 
 		std_msgs::UInt16 Vout_left, Vout_right;

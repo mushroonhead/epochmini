@@ -171,6 +171,9 @@ target_link_libraries(purepursuit1  ${catkin_LIBRARIES})
 add_executable(nofilter_pose_publisher src/nofilter_pose_publisher.cpp)
 target_link_libraries(nofilter_pose_publisher  ${catkin_LIBRARIES})
 
+add_executable(nofilter_pose_publisher2 src/nofilter_pose_publisher2.cpp)
+target_link_libraries(nofilter_pose_publisher2  ${catkin_LIBRARIES})
+
 add_executable(tf_worldtobase_goal src/tf_worldtobase_goal.cpp)
 target_link_libraries(tf_worldtobase_goal  ${catkin_LIBRARIES})
 

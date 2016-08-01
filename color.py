@@ -5,12 +5,13 @@ import numpy as np
 # out = cv2.VideoWriter("output.avi", -1, 20, (640, 480))
 
 #capturing video through webcam
-cap=cv2.VideoCapture(1)
+cap=cv2.VideoCapture(0)
 cap.set(3,640)
 cap.set(4,480)
 cv2.waitKey(500)
 
 while(1):
+	list_obj = []
 	ret, img = cap.read()
 
 	#print 'img', len(img[0])
@@ -85,6 +86,7 @@ while(1):
 			cv2.putText(img,"Blue color",(x,y),cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255,0,0))
 			#print 'Shape3', img.shape
 			#print "Blue in frame"
+
 
 	# #tracking Yellow
 		# (_,contours,hierarchy)=cv2.findContours(yellow,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
