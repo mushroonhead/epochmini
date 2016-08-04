@@ -1,5 +1,5 @@
 <launch>
-	<node name="imugpspublisher4SVY21" pkg="epochmini" type="imugpspublisher4SVY21.py" />
+	<node name="sampleimugpspublisher2SVY21" pkg="epochmini" type="sampleimugpspublisher2SVY21.py" />
 
 	<node name="nofilter_pose_publisher" pkg="epochmini" type="nofilter_pose_publisher" />
 

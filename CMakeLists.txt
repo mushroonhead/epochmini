@@ -198,6 +198,15 @@ target_link_libraries(goalpublisher2  ${catkin_LIBRARIES})
 add_executable(simplepid2 src/simplepid2.cpp)
 target_link_libraries(simplepid2  ${catkin_LIBRARIES})
 
+add_executable(goalpathpublisher src/goalpathpublisher.cpp)
+target_link_libraries(goalpathpublisher  ${catkin_LIBRARIES})
+
+add_executable(occupancytransform src/occupancytransform.cpp)
+target_link_libraries(occupancytransform  ${catkin_LIBRARIES})
+
+add_executable(goaltracker src/goaltracker.cpp)
+target_link_libraries(goaltracker  ${catkin_LIBRARIES})
+
 #############
 ## Install ##
 #############

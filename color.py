@@ -5,7 +5,7 @@ import numpy as np
 # out = cv2.VideoWriter("output.avi", -1, 20, (640, 480))
 
 #capturing video through webcam
-cap=cv2.VideoCapture(0)
+cap=cv2.VideoCapture(1)
 cap.set(3,640)
 cap.set(4,480)
 cv2.waitKey(500)
