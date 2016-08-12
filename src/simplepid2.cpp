@@ -35,7 +35,7 @@ public:
 		desired_left_velocity = desired_linear_vel - l*desired_angular_vel;
 		desired_right_velocity = desired_linear_vel + l*desired_angular_vel;
 		if (state != 1) { //ie values not initiated, go to default
-			Kp = 0.5; Ki = 0.0; Kd = 0.5, V_left = 63.5, V_right = 63.5, state = 1; 
+			Kp = 1.5; Ki = 0.0; Kd = 2.0, V_left = 63.5, V_right = 63.5, state = 1; 
 			//default values and marked init
 		}
 		epl = desired_left_velocity - currentVel_left;
@@ -48,21 +48,19 @@ public:
 			epl, eil, edl, epr, eir, edr);
 		printf("Verror_left=%f, Verror_right=%f, V_left=%f, V_right=%f\n", 
 			Verror_left, Verror_right, V_left, V_right);
-		V_left += Verror_left;
+		V_left -= Verror_left;
 		if (V_left > 100.0){
 			V_left = 100.0;
 		}
-		else if (V_left < 27.0){
-			V_left = 27.0;
+		else if (V_left < 28.0){
+			V_left = 28.0;
 		}
-		V_right += Verror_right;
+		V_right -= Verror_right;
 		if (V_right > 100.0){
 			V_right = 100.0;	
-
-			
 		}
-		else if (V_right < 27.0){
-			V_right = 27.0;
+		else if (V_right < 28.0){
+			V_right = 28.0;
 		}
 
 		std_msgs::UInt16 Vout_left, Vout_right;

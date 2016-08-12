@@ -31,22 +31,22 @@ public:
 		printf("x=%f, y=%f \n", goal->poses.last().pose.position.x, goal->poses.last().pose.position.y);
 		double desired_linear_vel, desired_angular_vel, angDesired;
 		if (state!= 1) {//no input yet go to defaults
-			ka = 0.5; //constant for ang, to be tuned
+			ka = 1.2 //constant for ang, to be tuned
 			max_av = 2.0; //max limit for ang_vel
-			kv = 0.5; //constant for dist traveled, to be tuned
-			max_lv = 3.0; //max limit for lin_vel
-			state = 1;
+			kv = 0.2; //constant for dist traveled, to be tuned
+			max_lv = 1.5; //max limit for lin_vel
+			state = 1
 		}
-		if (fabs(goal->poses.last().pose.position.x) < 0.1 and fabs(goal->poses.last().pose.position.y) < 0.1){
+		if (fabs(goal->poses.last().pose.position.x) < 0.5 and fabs(goal->poses.last().pose.position.y) < 0.5){
 			printf("%s\n", "Case 1");
 			//no goal input yet
 			desired_linear_vel = 0.0;
 			desired_angular_vel = 0.0;
 		}
-		else if (goal->poses.last().pose.position.x < -1.0) {
+		else if (goal->poses.last().pose.position.x < -0.5) {
 			printf("%s\n", "Case 2");
 			//for cases where the point is far behind the boat,
-			//prevent moving long distances backwards
+			//prevent moving long distances backwards			
 			desired_linear_vel = 0.0;
 			angDesired = atan2(goal->poses.last().pose.position.y,goal->poses.last().pose.position.x);
 			printf("Desired Angle=%f\n", angDesired);

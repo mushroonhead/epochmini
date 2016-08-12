@@ -28,7 +28,7 @@ public:
 		oldPose.pose = mapIn->info.origin;
 		try{
 			ls.transformPose("map", oldPose, newPose);
-			if (ros::Time::now().toSec() - tf_timer.toSec() > 2){
+			if (ros::Time::now().toSec() - tf_timer.toSec() > 3){
 				nav_msgs::OccupancyGrid mapOut;
 				mapOut = *mapIn;
 				mapOut.header.frame_id = "map";

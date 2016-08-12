@@ -7,10 +7,16 @@
 
 	<node name="tf_worldtobase_goal" pkg="epochmini" type="tf_worldtobase_goal" />
 
-	<node name="purepursuit1" pkg="epochmini" type="purepursuit1" />
+	<!-- <node name="purepursuit1" pkg="epochmini" type="purepursuit1" />
 
-	<node name="simplepid2" pkg="epochmini" type="simplepid2" />
+	<node name="simplepid2" pkg="epochmini" type="simplepid2" /> -->
+
+	<node name="pointandgo" pkg="epochmini" type="pointandgo" />
 
 	<node name="rosserial_arduino" pkg="rosserial_python" type="serial_node.py" args="/dev/ttyACM1" />
+
+	<node name="colourtracker" pkg="epochmini" type="colourtracker.py" />
+
+	<node name="lms111_publisher" pkg="lms1xx" type="LMS1xx_node" />
 
 </launch>

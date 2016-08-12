@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <nav_msgs/Path.h>
 #include <std_msgs/Float64MultiArray.h>
 #include <cmath>
 
@@ -17,7 +17,7 @@ public:
 		subinp = n.subscribe("user_input/purepursuit", 10, &SubscribeAndPublish::inpCallback, this);
 	}
 
-	void goalCallback(const geometry_msgs::PoseStamped::ConstPtr& goal) {
+	void goalCallback(const nav_msgs::Path::ConstPtr& goal) {
 		std_msgs::Float64MultiArray desiredSpeed;
 		std_msgs::MultiArrayDimension m;
 		m.label = "desiredSpeed";
@@ -28,38 +28,47 @@ public:
 		desiredSpeed.layout.data_offset = 0;
 		//linear velocity in ms^-1, angular velocity in rads^-1 +ve clockwise
 		//for calculation refer to documentation on pure pursuit
-		printf("x=%f, y=%f \n", goal->pose.position.x, goal->pose.position.y);
+		//look for desired pose depenging on look up distance
+		lookup = 1.0;
+		for (unsigned int i = 0; i <sizeof(goal->poses)/sizeof(goal->poses[0]); i = i+1){
+			latest_x = goal->poses[i].pose.position.x;
+			latest_y = goal->poses[i].pose.position.y;
+			if (fabs(latest_x) > lookup and fabs(latest_y) > lookup){
+				break;
+			}
+		}
+		printf("x=%f, y=%f \n", latest_x, latest_y);
 		double desired_linear_vel, desired_angular_vel, angDesired;
 		if (state!= 1) {//no input yet go to defaults
 			ka = 1.2; //constant for ang, to be tuned
-			max_av = 1.5; //max limit for ang_vel
-			kv = 0.3; //constant for dist traveled, to be tuned
+			max_av = 2.0; //max limit for ang_vel
+			kv = 0.2; //constant for dist traveled, to be tuned
 			max_lv = 1.5; //max limit for lin_vel
 			state = 1;
 		}
-		if (fabs(goal->pose.position.x) < 0.5 and fabs(goal->pose.position.y) < 0.5){
+		if (fabs(latest_x) < 0.5 and fabs(latest_y) < 0.5){
 			printf("%s\n", "Case 1");
 			//no goal input yet
 			desired_linear_vel = 0.0;
 			desired_angular_vel = 0.0;
 		}
-		else if (goal->pose.position.x < -1.0) {
+		else if (latest_x < -0.5) {
 			printf("%s\n", "Case 2");
 			//for cases where the point is far behind the boat,
-			//prevent moving long distances backwards
+			//prevent moving long distances backwards			
 			desired_linear_vel = 0.0;
-			angDesired = atan2(goal->pose.position.y,goal->pose.position.x);
+			angDesired = atan2(latest_y,latest_x);
 			printf("Desired Angle=%f\n", angDesired);
 			desired_angular_vel = ka*angDesired;
 			if (desired_angular_vel > max_av) {
 				desired_angular_vel = max_av;
 			}
 		}
-		else if (fabs(goal->pose.position.y/goal->pose.position.x) < 0.1) {
+		else if (fabs(latest_y/latest_x) < 0.1) {
 			printf("%s\n", "Case 3");
-			printf("%f\n", fabs((goal->pose.position.y)/(goal->pose.position.x)));
+			printf("%f\n", fabs((latest_y)/(latest_x)));
 			//for the case where R tends to infinity
-			double l = goal->pose.position.x;
+			double l = latest_x;
 			printf("l=%f\n", l);
 			desired_linear_vel = kv*l;
 			if (desired_linear_vel > max_lv) {
@@ -73,8 +82,8 @@ public:
 			double l_sqr, r, d, pp_x, pp_y;
 			//frame changed to match that of pure pursuit papers,
 			//ie right, front, up from front. left, up
-			pp_x = -goal->pose.position.y;
-			pp_y = goal->pose.position.x;
+			pp_x = -latest_y;
+			pp_y = latest_x;
 			l_sqr = pow(pp_x, 2) + pow(pp_y, 2);
 			r = l_sqr/(2*pp_x); //only negative when turn is left
 			d = r-pp_x;
@@ -105,7 +114,7 @@ public:
 		desiredSpeed.data.push_back(desired_angular_vel);
 		pub.publish(desiredSpeed);
 		ROS_INFO("Goal: x=%f, y=%f, Desired Velocity: l_vel=%f a_vel=%f", 
-			goal->pose.position.x, goal->pose.position.y, desired_linear_vel, desired_angular_vel);
+			latest_x, latest_y, desired_linear_vel, desired_angular_vel);
 	}
 
 	void inpCallback(const std_msgs::Float64MultiArray::ConstPtr& inp) {
@@ -127,12 +136,13 @@ private:
 	int state;
 
 	double ka, kv, max_av, max_lv;//to be tuned
+	double lookup, latest_x, latest_y;
 
 };
 
 int main(int argc, char** argv){
-	ros::init(argc, argv, "purepursuit1");
-	SubscribeAndPublish purepursuit1;
+	ros::init(argc, argv, "purepursuit3");
+	SubscribeAndPublish purepursuit3;
 
 	ros::spin();
 	

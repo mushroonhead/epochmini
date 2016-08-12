@@ -207,6 +207,15 @@ target_link_libraries(occupancytransform  ${catkin_LIBRARIES})
 add_executable(goaltracker src/goaltracker.cpp)
 target_link_libraries(goaltracker  ${catkin_LIBRARIES})
 
+add_executable(pointandgo src/pointandgo.cpp)
+target_link_libraries(pointandgo  ${catkin_LIBRARIES})
+
+add_executable(purepursuit3 src/purepursuit3.cpp)
+target_link_libraries(purepursuit3  ${catkin_LIBRARIES})
+
+add_executable(pathreader src/pathreader.cpp)
+target_link_libraries(pathreader  ${catkin_LIBRARIES})
+
 #############
 ## Install ##
 #############
